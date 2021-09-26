@@ -13,7 +13,7 @@ class AnimeDataset(torch.utils.data.Dataset):
         
         
     def __getitem__(self, index):
-        img_path = os.path.join(self.dir_path, str(index)+'.png')
+        img_path = os.path.join(self.dir_path, str(index+1)+'.png')
         image = io.read_image(img_path, mode = io.image.ImageReadMode.RGB)
         return image
     
