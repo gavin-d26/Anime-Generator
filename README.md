@@ -10,7 +10,7 @@ game until the discriminator can no longer tell apart the real and generated ima
  
 The architecture follows the is DCGAN paper. However, two additional CNN layers have been added after the final layer to mitigate the checkerboard artifects caused by transpose convolutions.
 
-<img src="content/gan-framework.png" height=50% width=50%>
+<img src="content/gan-framework.png" height=80% width=80%>
 
 ### Generator
 The generator takes in a 100 dimensional noise vector sampled from a normal distribution of zero mean and unit variance N(0,1).
