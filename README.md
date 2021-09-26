@@ -18,6 +18,9 @@ It produces an image of size (64,64,3) with pixel values of the range [-1,1].
 
 # Dataset 
 The dataset is available [here](https://www.kaggle.com/soumikrakshit/anime-faces) on Kaggle. The dataset consists of 21551 anime faces that were obtained from www.getchu.com using a face
-detector based on the repo https://github.com/nagadomi/lbpcascade_animeface.
+detector based on [this repo](https://github.com/nagadomi/lbpcascade_animeface).
 The dataset contains images of size 64 by 64 pixels.
+
+<img src="sample images/18.png" height=12% width=12%> <img src="sample images/17.png" height=12% width=12%> <img src="sample images/19.png" height=12% width=12%> <img src="sample images/20.png" height=12% width=12%>
+
   
