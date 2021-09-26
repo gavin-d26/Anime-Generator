@@ -2,8 +2,6 @@
 A Pytorch implementation of Deep Convolutional Generative adverserial network (DCGAN) to generate anime faces.
 The model generates anime faces from random noise given as input.
 
-<img src="https://i.imgur.com/fB2UocO.png">
-
 # Model Architecture
 GANs are a self-supervised approach used to train generative models by using two sub-models: a Generator and a Discriminator. 
 The generator is trained to generate new images while the discriminator tries to 
