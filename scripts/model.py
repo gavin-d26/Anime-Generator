@@ -1,8 +1,11 @@
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import BCEWithLogitsLoss
+import matplotlib.pyplot as plt
 import torchvision
+import utils
 import hydramodule
+
 
 
 
@@ -48,7 +51,7 @@ class Generator(nn.Module):
 class DisBlock(nn.Module):
     def __init__(self, inc, outc, ksize, stride, padding, bias = False):
         super(DisBlock, self).__init__()
-        self.conv = nn.Conv2d(inc, outc, ksize, stride, padding, bias=bias)
+        self.conv = nn.Conv2d(inc, outc, ksize, stride, (padding,padding), bias=bias)
         self.bn = nn.BatchNorm2d(outc)
         self.activation = nn.LeakyReLU(0.2, inplace=True)
         
@@ -80,9 +83,10 @@ class Discriminator(nn.Module):
     
     
 class GAN(hydramodule.HydraModule):
-    def __init__(self, config):
+    def __init__(self, config, stats = ((0.5,0.5,0.5),(0.5,0.5,0.5))):
         super(GAN, self).__init__()
         self.config = config
+        self.stats = stats
         self.nz = config.nz
         self.training_steps_count = 0
         self.dis_freq = config.dis_freq
@@ -96,12 +100,15 @@ class GAN(hydramodule.HydraModule):
         self.example_noise = self.get_noise(5)
     
     def configure_loss_fn(self, *args, **kwargs):
-        return [BCEWithLogitsLoss]
+        return [BCEWithLogitsLoss()]
     
     def configure_optimizers_and_schedulers(self):
         dis_opt = torch.optim.Adam(self.D.parameters(), lr = self.config.lr, betas = (self.config.beta1, self.config.beta2))
         gen_opt = torch.optim.Adam(self.G.parameters(), lr = self.config.lr, betas = (self.config.beta1, self.config.beta2))
-        return [dis_opt, gen_opt]
+        return [dis_opt, gen_opt], None
+    
+    def configure_metrics(self, *args, **kwargs):
+        return None, None
     
     
     
@@ -120,12 +127,12 @@ class GAN(hydramodule.HydraModule):
     
     
     def get_noise(self, n_samples):
-        return torch.randn(n_samples, self.nz, device = self.device)
+        return torch.randn(n_samples, self.nz,1,1, device = self.device)
     
 
     def train_step(self, batch):
         dis_opt, gen_opt = self.get_optimizers()
-        loss_fn = self.get_loss_fn(self)
+        loss_fn = self.get_loss_fn()
         batch_len = len(batch)
         real_images = batch
         ## discriminator training
@@ -149,7 +156,7 @@ class GAN(hydramodule.HydraModule):
         # generator training
         
         gen_opt.zero_grad()
-        fake_noise2 = self.get_noice(batch_len)
+        fake_noise2 = self.get_noise(batch_len)
         
         dis_fake_pred2 = self.D(self.G(fake_noise2))
         
@@ -161,7 +168,9 @@ class GAN(hydramodule.HydraModule):
         # print loss values and display example images
         if self.training_steps_count % (self.dis_freq * 10) == 0:
             print(f'disc_loss: {dis_net_loss}    gen_loss: {gen_loss}' )
-            torchvision.utils.make_grid(self.G(self.example_noise), nrow = 5)
+            grid = torchvision.utils.make_grid(utils.denormalize(self.G(self.example_noise), self.stats), nrow = 5)
+            plt.imshow(grid.permute(1,2,0).numpy())
+            plt.show()
             
         self.training_steps_count+=1
         
